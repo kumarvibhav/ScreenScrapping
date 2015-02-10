@@ -11,8 +11,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class AirAsiaScraper implements FlightDetailsScraper {
-    private static final String DEPARTURE_DETAIL_TABLE_ID      = "fareTable1_4";
-    private static final String RETURN_DETAIL_TABLE_ID         = "fareTable2_4";
     private static final String FLIGHT_ROW_CLASS               = "rgRow";
     private static final String JOURNEY_TYPE_ELEMENT_ID        = "ControlGroupAvailabilitySearchInputSelectView_AvailabilitySearchInputSelectView_RoundTrip";
     private static final String CHARACTER_SET                  = "UTF-8";
@@ -56,11 +54,11 @@ public class AirAsiaScraper implements FlightDetailsScraper {
     }
 
     public List<Flight> extractDepartureDetails() {
-        return getFlights(DEPARTURE_DETAIL_TABLE_ID);
+        return getFlights(0);
     }
 
     public List<Flight> extractReturnDetails() {
-        return getFlights(RETURN_DETAIL_TABLE_ID);
+        return getFlights(1);
     }
 
     public List<String> getClassTypes() {
@@ -72,9 +70,16 @@ public class AirAsiaScraper implements FlightDetailsScraper {
         return classTypes;
     }
 
-    private List<Flight> getFlights(String tableId) {
-        Elements flightDetailElements = bodyElement.getElementById(tableId).getElementsByClass(FLIGHT_ROW_CLASS);
-        List<Flight> flights = new ArrayList<Flight>();
+    private List<Flight> getFlights(int tableNUmber) {
+    	List<Flight> flights = new ArrayList<Flight>();
+    	Elements flightDetailElements;
+    	try {
+    		flightDetailElements = bodyElement.getElementsByClass("rgMasterTable").get(tableNUmber).getElementsByClass(FLIGHT_ROW_CLASS);
+    	} catch (IndexOutOfBoundsException ex) {
+    		return flights;
+    	}
+        
+        
         Flight flight;
         String arrivalDate;
         String localDepartureTime;
